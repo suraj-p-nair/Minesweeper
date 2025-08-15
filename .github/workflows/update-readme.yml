@@ -1,0 +1,40 @@
+name: Update README on Commit
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get last commit message and description
+        id: commit
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%s)
+          COMMIT_DESC=$(git log -1 --pretty=%b)
+          echo "msg=$COMMIT_MSG" >> $GITHUB_ENV
+          echo "desc=$COMMIT_DESC" >> $GITHUB_ENV
+
+      - name: Append commit details to README.md
+        run: |
+          {
+            echo ""
+            echo "## **${{ env.msg }}**"
+            echo ""
+            echo "${{ env.desc }}"
+            echo ""
+          } >> README.md
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update README with commit: ${{ env.msg }}" || echo "No changes to commit"
+          git push
