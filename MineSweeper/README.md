@@ -3,15 +3,9 @@ Game dev proj 1
 
 # Pre git hook message to test
 
-# Second test
+# switched to git actions
+git hooks will not be pursued any further for readme updates with commit messages
 
-# Third Test
-
-# fourth test
-
-# fifth test
-# sixth test
-# Test 7
 
 
 
