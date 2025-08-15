@@ -22,10 +22,21 @@ jobs:
         id: commit
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%s)
-          COMMIT_DESC=$(git log -1 --pretty=%b)
-          echo "msg=$COMMIT_MSG" >> $GITHUB_ENV
-          echo "desc=$COMMIT_DESC" >> $GITHUB_ENV
+            COMMIT_DESC=$(git log -1 --pretty=%b)
 
+            # Escape special characters for GitHub Actions env
+            COMMIT_MSG="${COMMIT_MSG//'%'/'%25'}"
+            COMMIT_MSG="${COMMIT_MSG//$'\n'/'%0A'}"
+            COMMIT_MSG="${COMMIT_MSG//$'\r'/'%0D'}"
+            COMMIT_MSG="${COMMIT_MSG//:/'%3A'}"
+
+            COMMIT_DESC="${COMMIT_DESC//'%'/'%25'}"
+            COMMIT_DESC="${COMMIT_DESC//$'\n'/'%0A'}"
+            COMMIT_DESC="${COMMIT_DESC//$'\r'/'%0D'}"
+            COMMIT_DESC="${COMMIT_DESC//:/'%3A'}"
+
+            echo "msg=$COMMIT_MSG" >> $GITHUB_ENV
+            echo "desc=$COMMIT_DESC" >> $GITHUB_ENV
       - name: Append commit details to README.md
         run: |
           {
