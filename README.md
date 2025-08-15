@@ -24,3 +24,4 @@ learned that using stack panel to host the textfield didnt align it properly, bu
 changed workflow to accept special charecters in commit message
 decoding the special chareccters to properly display in the readme
 
+## Merged feature/GitHubActions
