@@ -1,5 +1,8 @@
 name: Update README on Commit
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -12,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get last commit message and description
         id: commit
@@ -33,8 +38,8 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add README.md
           git commit -m "Update README with commit: ${{ env.msg }}" || echo "No changes to commit"
           git push
