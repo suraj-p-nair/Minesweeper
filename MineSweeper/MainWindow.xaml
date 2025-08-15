@@ -5,16 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MineSweeper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="300" Width="300">
-    <Grid Margin="0,0,0,-6">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Height="40" Background="LightGray">
-        </StackPanel>
-
-        <UniformGrid Name="MineField" Grid.Row="1" Rows="10" Columns="10"/>
+        Title="MainWindow" Height="450" Width="400">
+    <Grid Margin="0,0,0,0">
+        <Frame x:Name="MainFrame"
+               NavigationUIVisibility="Hidden"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch"
+               Margin="0"
+               BorderThickness="0" 
+               SnapsToDevicePixels="True"
+               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+               ScrollViewer.VerticalScrollBarVisibility="Disabled" />   
     </Grid>
 </Window>
