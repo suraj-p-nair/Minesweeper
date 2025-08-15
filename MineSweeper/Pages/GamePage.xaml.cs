@@ -12,29 +12,29 @@ namespace MineSweeper.Pages
     /// </summary>
     public partial class GamePage : Page
     {
+        private int[] MinePositions = [];
+        private int MineCount = 0;
         public GamePage()
         {
             InitializeComponent();
+            GenerateMinePositions();
             CreateBoard();
             StartTimer();
         }
 
-        Image flag = new()
-        {
-            Source = new BitmapImage(new Uri("pack://application:,,,/Assets/flag.png"))
-        };
         private void CreateBoard()
         {
             for (int i = 0; i < 100; i++)
             {
                 var cellData = new CellData
                 {
-                    DisplayValue = $"Cell {i}"
+                    DisplayValue = $"Cell {i}",
+                    IsMine = MinePositions.Contains(i)
                 };
 
                 Button btn = new()
                 {
-                    Content = "",
+                    Content = cellData.IsMine ? "1" : "",
                     Tag = cellData,
                     FontFamily = new FontFamily("Segoe UI Emoji")
                 };
@@ -63,7 +63,7 @@ namespace MineSweeper.Pages
                 if (!cell.IsRevealed && !cell.IsFlagged)
                 {
                     cell.IsRevealed = true;
-                    btn.Content = cell.DisplayValue;
+                    btn.Content = cell.IsMine ? GetMine() : cell.DisplayValue;
                     btn.IsEnabled = false;
                 }
             }
@@ -75,7 +75,7 @@ namespace MineSweeper.Pages
             {
                 cell.IsFlagged = !cell.IsFlagged;
                 btn.Content = cell.IsFlagged ?  GetFlag(): "";
-                
+                MineCounter.Text = cell.IsFlagged ? (++MineCount).ToString() : (--MineCount).ToString();
             }
         }
 
@@ -83,9 +83,26 @@ namespace MineSweeper.Pages
         {
             return new Image { Source = FlagSource };
         }
+        private static Image GetMine()
+        {
+            return new Image { Source = MineSource };
+        }
 
         private static readonly BitmapImage FlagSource = new(
             new Uri("pack://application:,,,/Assets/flag.png")
         );
+        private static readonly BitmapImage MineSource = new(
+            new Uri("pack://application:,,,/Assets/mine.png")
+        );
+        private void GenerateMinePositions()
+        {
+            Random rng = new Random();
+            MinePositions = [.. Enumerable.Range(0, 100)
+                                        .OrderBy(_ => rng.Next())
+                                        .Take(10)];
+            Console.WriteLine(string.Join(", ", MinePositions));
+            MineCount = 10;
+            MineCounter.Text = MineCount.ToString();
+        }
     }
 }

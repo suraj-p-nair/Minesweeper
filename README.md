@@ -31,8 +31,12 @@ decoding the special chareccters to properly display in the readme
 • Prevented revealing a cell if it is flagged.
 • Fixed workflow issue where README was unnecessarily updated with duplicate values from a previous merge when a branch was published.
 
+## **Added Mines**
 
-## ****
-
-
+• Generated 10 random numbers between 0–99 to determine mine positions.
+• Placed a mine if the cell number matches a generated number.
+• Added temporary debug display: ‘1’ for cells with mines, empty string for cells without mines.
+• Implemented mine counter display.
+• Mine counter increments when a flag is placed and decrements when a flag is removed.
+• Investigated issue where pull request merge and branch publish still trigger workflow to update README with empty message, added fix for testing.
 
