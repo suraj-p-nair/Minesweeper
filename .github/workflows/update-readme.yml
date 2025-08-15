@@ -25,14 +25,13 @@ jobs:
           COMMIT_MSG=$(git log -1 --pretty=%s)
           COMMIT_DESC=$(git log -1 --pretty=%b)
 
-          # Skip if commit is from bot
-          if [[ "$AUTHOR" == "github-actions[bot]" ]]; then
-            echo "Skipping bot commit"
-            exit 0
+          # Skip if commit publish branch or merge commit into develop
+          if [[ "$COMMIT_MSG" == "Publish branch"* ]]; then
+              echo "Skipping publish branch commit"
+              exit 0
           fi
 
-          # Skip if this is a merge commit into develop
-          if [[ "$COMMIT_MSG" == Merge* ]] && git branch --contains HEAD | grep -q "develop"; then
+         if [[ "$GITHUB_REF" == "refs/heads/develop" ]] && [[ "$COMMIT_MSG" =~ ^Merge ]]; then
             echo "Skipping merge commit into develop"
             exit 0
           fi

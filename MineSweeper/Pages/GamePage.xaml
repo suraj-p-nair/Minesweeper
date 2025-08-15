@@ -15,8 +15,15 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+
+
         <Grid Grid.Row="0" Height="60" Background="LightGray" HorizontalAlignment="Stretch" VerticalAlignment="Center">
-            <TextBlock Text="0" x:Name="Timer" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="0" x:Name="Timer" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Grid.Column="0"/>
+            <TextBlock Text="{Binding MineCount}" x:Name="MineCounter" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Grid.Column="1"/>
         </Grid>
 
         <UniformGrid Name="MineField" Grid.Row="1" Rows="10" Columns="10"/>
