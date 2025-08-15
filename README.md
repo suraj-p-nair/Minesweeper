@@ -5,9 +5,6 @@ Game dev proj 1
 
 Adding GitHub Actions YML to update reademe with commit message on every push
 
-
-## **Merged feature/GitHubActions**
-
 ## **Added Pages And Timer**
 
 Refactored the application from a single window app to single frame-multi pages allowing to show different pages to users like start menu, settings, game itself etc
@@ -23,15 +20,3 @@ learned that using stack panel to host the textfield didnt align it properly, bu
 
 changed workflow to accept special charecters in commit message
 decoding the special chareccters to properly display in the readme
-
-## Merged feature/GitHubActions
-
-## **Update README.md**
-
-
-
-
-## **Update README with commit: Update README.md**
-
-
-
