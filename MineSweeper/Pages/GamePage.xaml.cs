@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MineSweeper.Models;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace MineSweeper.Pages
 {
@@ -24,31 +16,76 @@ namespace MineSweeper.Pages
         {
             InitializeComponent();
             CreateBoard();
+            StartTimer();
         }
 
+        Image flag = new()
+        {
+            Source = new BitmapImage(new Uri("pack://application:,,,/Assets/flag.png"))
+        };
         private void CreateBoard()
         {
             for (int i = 0; i < 100; i++)
             {
+                var cellData = new CellData
+                {
+                    DisplayValue = $"Cell {i}"
+                };
+
                 Button btn = new()
                 {
-                    Content = $"{i}"
+                    Content = "",
+                    Tag = cellData,
+                    FontFamily = new FontFamily("Segoe UI Emoji")
                 };
+
+                btn.Click += RevealCell;
+                btn.MouseRightButtonDown += FlagCell;
+
                 MineField.Children.Add(btn);
             }
-            StartTimer();
-
         }
         private async void StartTimer()
         {
             int time = 0;
             while (true)
             {
-                
+
                 await Task.Delay(1000);
                 time++;
                 Timer.Text = time.ToString();
             }
         }
+        private void RevealCell(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is CellData cell)
+            {
+                if (!cell.IsRevealed && !cell.IsFlagged)
+                {
+                    cell.IsRevealed = true;
+                    btn.Content = cell.DisplayValue;
+                    btn.IsEnabled = false;
+                }
+            }
+        }
+
+        private void FlagCell(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is CellData cell)
+            {
+                cell.IsFlagged = !cell.IsFlagged;
+                btn.Content = cell.IsFlagged ?  GetFlag(): "";
+                
+            }
+        }
+
+        private static Image GetFlag()
+        {
+            return new Image { Source = FlagSource };
+        }
+
+        private static readonly BitmapImage FlagSource = new(
+            new Uri("pack://application:,,,/Assets/flag.png")
+        );
     }
 }

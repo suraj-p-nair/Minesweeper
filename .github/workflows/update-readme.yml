@@ -21,33 +21,47 @@ jobs:
       - name: Get last commit message and description
         id: commit
         run: |
+          AUTHOR=$(git log -1 --pretty=format:'%an')
           COMMIT_MSG=$(git log -1 --pretty=%s)
-            COMMIT_DESC=$(git log -1 --pretty=%b)
+          COMMIT_DESC=$(git log -1 --pretty=%b)
 
-            # Escape special characters for GitHub Actions env
-            COMMIT_MSG="${COMMIT_MSG//'%'/'%25'}"
-            COMMIT_MSG="${COMMIT_MSG//$'\n'/'%0A'}"
-            COMMIT_MSG="${COMMIT_MSG//$'\r'/'%0D'}"
-            COMMIT_MSG="${COMMIT_MSG//:/'%3A'}"
+          # Skip if commit is from bot
+          if [[ "$AUTHOR" == "github-actions[bot]" ]]; then
+            echo "Skipping bot commit"
+            exit 0
+          fi
 
-            COMMIT_DESC="${COMMIT_DESC//'%'/'%25'}"
-            COMMIT_DESC="${COMMIT_DESC//$'\n'/'%0A'}"
-            COMMIT_DESC="${COMMIT_DESC//$'\r'/'%0D'}"
-            COMMIT_DESC="${COMMIT_DESC//:/'%3A'}"
+          # Skip if this is a merge commit into develop
+          if [[ "$COMMIT_MSG" == Merge* ]] && git branch --contains HEAD | grep -q "develop"; then
+            echo "Skipping merge commit into develop"
+            exit 0
+          fi
 
-            echo "msg=$COMMIT_MSG" >> $GITHUB_ENV
-            echo "desc=$COMMIT_DESC" >> $GITHUB_ENV
+          # Escape special characters for GitHub Actions env
+          COMMIT_MSG="${COMMIT_MSG//'%'/'%25'}"
+          COMMIT_MSG="${COMMIT_MSG//$'\n'/'%0A'}"
+          COMMIT_MSG="${COMMIT_MSG//$'\r'/'%0D'}"
+          COMMIT_MSG="${COMMIT_MSG//:/'%3A'}"
+
+          COMMIT_DESC="${COMMIT_DESC//'%'/'%25'}"
+          COMMIT_DESC="${COMMIT_DESC//$'\n'/'%0A'}"
+          COMMIT_DESC="${COMMIT_DESC//$'\r'/'%0D'}"
+          COMMIT_DESC="${COMMIT_DESC//:/'%3A'}"
+
+          echo "msg=$COMMIT_MSG" >> $GITHUB_ENV
+          echo "desc=$COMMIT_DESC" >> $GITHUB_ENV
+
       - name: Append commit details to README.md
         run: |
-            MSG=$(echo "${{ env.msg }}" | sed 's/%0A/\n/g' | sed 's/%3A/:/g' | sed 's/%25/%/g')
-            DESC=$(echo "${{ env.desc }}" | sed 's/%0A/\n/g' | sed 's/%3A/:/g' | sed 's/%25/%/g')
-            {
-                echo ""
-                echo "## **$MSG**"
-                echo ""
-                echo "$DESC"
-                echo ""
-            } >> README.md
+          MSG=$(echo "${{ env.msg }}" | sed 's/%0A/\n/g' | sed 's/%3A/:/g' | sed 's/%25/%/g')
+          DESC=$(echo "${{ env.desc }}" | sed 's/%0A/\n/g' | sed 's/%3A/:/g' | sed 's/%25/%/g')
+          {
+              echo ""
+              echo "## **$MSG**"
+              echo ""
+              echo "$DESC"
+              echo ""
+          } >> README.md
 
       - name: Commit and push changes
         run: |
