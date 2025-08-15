@@ -5,8 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MineSweeper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="300" Width="300">
+    <Grid Margin="0,0,0,-6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Height="40" Background="LightGray">
+        </StackPanel>
+
+        <UniformGrid Name="MineField" Grid.Row="1" Rows="10" Columns="10"/>
     </Grid>
 </Window>
