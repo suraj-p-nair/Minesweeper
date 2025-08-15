@@ -25,3 +25,8 @@ changed workflow to accept special charecters in commit message
 decoding the special chareccters to properly display in the readme
 
 ## Merged feature/GitHubActions
+
+## **Update README.md**
+
+
+
