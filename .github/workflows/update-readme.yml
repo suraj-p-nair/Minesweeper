@@ -39,13 +39,15 @@ jobs:
             echo "desc=$COMMIT_DESC" >> $GITHUB_ENV
       - name: Append commit details to README.md
         run: |
-          {
-            echo ""
-            echo "## **${{ env.msg }}**"
-            echo ""
-            echo "${{ env.desc }}"
-            echo ""
-          } >> README.md
+            MSG=$(echo "${{ env.msg }}" | sed 's/%0A/\n/g' | sed 's/%3A/:/g' | sed 's/%25/%/g')
+            DESC=$(echo "${{ env.desc }}" | sed 's/%0A/\n/g' | sed 's/%3A/:/g' | sed 's/%25/%/g')
+            {
+                echo ""
+                echo "## **$MSG**"
+                echo ""
+                echo "$DESC"
+                echo ""
+            } >> README.md
 
       - name: Commit and push changes
         run: |
