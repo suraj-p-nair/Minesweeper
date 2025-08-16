@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MineSweeper.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,15 +27,15 @@ namespace MineSweeper.Pages
         }
         private void StartEasy(object sender, RoutedEventArgs e)
         {
-            this.NavigationService?.Navigate(new GamePage(9,9,10));
+            this.NavigationService?.Navigate(new GamePage(GameConfig.Easy));
         }
         private void StartMedium(object sender, RoutedEventArgs e)
         {
-            this.NavigationService?.Navigate(new GamePage(16,16,40));
+            this.NavigationService?.Navigate(new GamePage(GameConfig.Medium));
         }
         private void StartHard(object sender, RoutedEventArgs e)
         {
-            this.NavigationService?.Navigate(new GamePage(16,30,60));
+            this.NavigationService?.Navigate(new GamePage(GameConfig.Hard));
         }
 
         private void Exit(object sender, RoutedEventArgs e)
