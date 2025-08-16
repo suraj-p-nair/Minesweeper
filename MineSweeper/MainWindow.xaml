@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MineSweeper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="400">
+        Title="MainWindow" Height="850" Width="600">
     <Grid Margin="0,0,0,0">
         <Frame x:Name="MainFrame"
                NavigationUIVisibility="Hidden"

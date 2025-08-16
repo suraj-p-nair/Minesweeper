@@ -24,9 +24,17 @@ namespace MineSweeper.Pages
         {
             InitializeComponent();
         }
-        private void StartGame(object sender, RoutedEventArgs e)
+        private void StartEasy(object sender, RoutedEventArgs e)
         {
-            this.NavigationService?.Navigate(new GamePage());
+            this.NavigationService?.Navigate(new GamePage(9,9,10));
+        }
+        private void StartMedium(object sender, RoutedEventArgs e)
+        {
+            this.NavigationService?.Navigate(new GamePage(16,16,40));
+        }
+        private void StartHard(object sender, RoutedEventArgs e)
+        {
+            this.NavigationService?.Navigate(new GamePage(16,30,60));
         }
 
         private void Exit(object sender, RoutedEventArgs e)
