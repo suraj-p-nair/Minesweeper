@@ -26,6 +26,6 @@
             <TextBlock Text="{Binding MineCount}" x:Name="MineCounter" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Grid.Column="1"/>
         </Grid>
 
-        <UniformGrid Name="MineField" Grid.Row="1" Rows="10" Columns="10"/>
+        <UniformGrid Name="MineFieldGrid" Grid.Row="1" Rows="10" Columns="10"/>
     </Grid>
 </Page>

@@ -5,8 +5,9 @@ permissions:
 
 on:
   push:
-    branches:
-      - '**'
+    branches-ignore:
+      - develop
+      - main
 
 jobs:
   update-readme:
@@ -25,15 +26,9 @@ jobs:
           COMMIT_MSG=$(git log -1 --pretty=%s)
           COMMIT_DESC=$(git log -1 --pretty=%b)
 
-          # Skip if commit publishes a branch
-          if [[ "$COMMIT_MSG" == "Publish branch"* ]]; then
-              echo "Skipping publish branch commit"
-              exit 0
-          fi
-
-          # Skip if this is a merge commit into develop
-          if [[ "$GITHUB_REF" == "refs/heads/develop" ]] && [[ "$COMMIT_MSG" =~ ^Merge ]]; then
-              echo "Skipping merge commit into develop"
+          # Skip if no file changes in this push
+          if [[ "$(git diff --name-only HEAD~1 HEAD | wc -l)" -eq 0 ]]; then
+              echo "Skipping empty push (branch publish)"
               exit 0
           fi
 

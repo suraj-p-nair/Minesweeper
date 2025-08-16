@@ -13,6 +13,8 @@ namespace MineSweeper.Models
         public int AdjacentMines { get; set; } = 0;
         public string DisplayValue { get; set; } = "";
         public bool IsFlagged { get; set; } = false;
+        public int Row { get; set; }
+        public int Col { get; set; }
     }
 
 }

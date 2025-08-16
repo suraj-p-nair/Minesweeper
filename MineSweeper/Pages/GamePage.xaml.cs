@@ -1,4 +1,5 @@
 ﻿using MineSweeper.Models;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -14,6 +15,7 @@ namespace MineSweeper.Pages
     {
         private int[] MinePositions = [];
         private int MineCount = 0;
+        private CellData[,] MineField = new CellData[10,10] ;
         public GamePage()
         {
             InitializeComponent();
@@ -29,12 +31,15 @@ namespace MineSweeper.Pages
                 var cellData = new CellData
                 {
                     DisplayValue = $"Cell {i}",
-                    IsMine = MinePositions.Contains(i)
+                    IsMine = MinePositions.Contains(i),
+                    Row = i / 10,
+                    Col = i % 10
                 };
+
+                MineField[i/10,i%10] = cellData;
 
                 Button btn = new()
                 {
-                    Content = cellData.IsMine ? "1" : "",
                     Tag = cellData,
                     FontFamily = new FontFamily("Segoe UI Emoji")
                 };
@@ -42,8 +47,10 @@ namespace MineSweeper.Pages
                 btn.Click += RevealCell;
                 btn.MouseRightButtonDown += FlagCell;
 
-                MineField.Children.Add(btn);
+                MineFieldGrid.Children.Add(btn);
             }
+            CalculateAdjacentMineCount();
+            UpdateCellMineCount();
         }
         private async void StartTimer()
         {
@@ -63,7 +70,7 @@ namespace MineSweeper.Pages
                 if (!cell.IsRevealed && !cell.IsFlagged)
                 {
                     cell.IsRevealed = true;
-                    btn.Content = cell.IsMine ? GetMine() : cell.DisplayValue;
+                    btn.Content = cell.IsMine ? GetMine() : cell.AdjacentMines;
                     btn.IsEnabled = false;
                 }
             }
@@ -74,7 +81,7 @@ namespace MineSweeper.Pages
             if (sender is Button btn && btn.Tag is CellData cell)
             {
                 cell.IsFlagged = !cell.IsFlagged;
-                btn.Content = cell.IsFlagged ?  GetFlag(): "";
+                btn.Content = cell.IsFlagged ? GetFlag() : "";
                 MineCounter.Text = cell.IsFlagged ? (++MineCount).ToString() : (--MineCount).ToString();
             }
         }
@@ -103,6 +110,55 @@ namespace MineSweeper.Pages
             Console.WriteLine(string.Join(", ", MinePositions));
             MineCount = 10;
             MineCounter.Text = MineCount.ToString();
+        }
+
+        private void CalculateAdjacentMineCount()
+        {
+            foreach (Button btn in MineFieldGrid.Children)
+            {
+                CellData cellData = (CellData)btn.Tag;
+
+                if (cellData.IsMine)
+                {
+                    UpdateAdjacentCells(cellData);
+                }
+            }
+        }
+
+        private void UpdateAdjacentCells(CellData currentCell)
+        {
+            int currRow = currentCell.Row;
+            int currCol = currentCell.Col;
+            foreach (int dr in new[] { -1, 0, 1 })
+            {
+                foreach (int dc in new[] { -1, 0, 1 })
+                {
+                    if (dr == 0 && dc == 0)
+                        continue;
+
+                    int nr = currRow + dr;
+                    int nc = currCol + dc;
+
+                    if (nr >= 0 && nr < 10 && nc >= 0 && nc < 10)
+                    {
+                        if (!MineField[nr, nc].IsMine)
+                        {
+                            MineField[nr, nc].AdjacentMines++;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        private void UpdateCellMineCount()
+        {
+            foreach (Button btn in MineFieldGrid.Children)
+            {
+                CellData cellData = (CellData)btn.Tag;
+
+                btn.Content = cellData.AdjacentMines;
+            }
         }
     }
 }
