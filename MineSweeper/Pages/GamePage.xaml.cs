@@ -38,7 +38,6 @@ namespace MineSweeper.Pages
             };
 
             SetupBoard();
-            _gameTimer.StartTimer();
         }
 
         private void SetupBoard()
@@ -48,6 +47,13 @@ namespace MineSweeper.Pages
             MineField = _gameBoard.CreateBoard(_gameProperties, MinePositions);
 
             _gameBoard.CalculateAdjacentMineCount(_gameProperties, MineField);
+
+            var (width, height) = BoardSizeFactory.GetSize(
+                _gameProperties.RowCount,
+                _gameProperties.ColumnCount);
+
+            MineFieldContainer.Width = width;
+            MineFieldContainer.Height = height;
 
             foreach (var cell in MineField)
             {
@@ -72,6 +78,10 @@ namespace MineSweeper.Pages
         {
             if (sender is Button btn && btn.Tag is CellData cell)
             {
+                if (!_gameTimer.IsRunning)   // <-- we’ll expose this property
+                {
+                    _gameTimer.StartTimer();
+                }
                 var result = _gameEngine.ToggleFlag(cell, _mineCount);
 
                 cell.IsFlagged = result.isFlagged;
@@ -86,12 +96,24 @@ namespace MineSweeper.Pages
         {
             if (sender is Button btn && btn.Tag is CellData cell)
             {
+                if (!_gameTimer.IsRunning)   // <-- we’ll expose this property
+                {
+                    _gameTimer.StartTimer();
+                }
+                if (cell.IsMine)
+                {
+                    _gameTimer.StopTimer();
+                    _uiHelper.RevealAll(MineField, cell);
+                    EndGame(false);
+                    return;
+                }
                 var revealedCells = _gameEngine.RevealCell(cell, MineField);
 
                 foreach (var revealed in revealedCells)
                 {
                     _uiHelper.UpdateCellUI(revealed);
                 }
+                
             }
         }
 
@@ -99,6 +121,8 @@ namespace MineSweeper.Pages
         {
             if (sender is Button btn && btn.Tag is CellData cell)
             {
+                if (!cell.IsRevealed || cell.AdjacentMines == 0)
+                    return;
                 var revealedCells = _gameEngine.RevealNeighborsIfFlagsMatch(cell, MineField);
 
                 foreach (var revealed in revealedCells)
@@ -115,7 +139,21 @@ namespace MineSweeper.Pages
             _mineCount = MinePositions.Length;
             MineCounter.Text = _mineCount.ToString();
             Timer.Text = "0";
+            _gameTimer.StopTimer();
             _gameTimer.ResetTimer();
         }
+
+        private void EndGame(bool isWin)
+        {
+            int currentTime = _gameTimer.time;
+            int? bestTime = SaveManager.GetBestTime(_gameProperties.Difficulty);
+            string title = isWin ? "You Win!" : "Game Over";
+
+            var overlay = new ResultOverlay(title, currentTime, bestTime);
+            OverlayHost.Content = overlay;
+            OverlayHost.Visibility = Visibility.Visible;
+        }
+
+
     }
 }

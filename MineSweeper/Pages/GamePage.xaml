@@ -29,6 +29,13 @@
             <TextBlock Text="{Binding MineCount}" x:Name="MineCounter" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Grid.Column="2"/>
         </Grid>
 
-        <helpers:SquareUniformGrid x:Name="MineFieldGrid" Grid.Row="1"/>
+        <Viewbox Stretch="Uniform" Grid.Row="1">
+            <Grid x:Name="MineFieldContainer">
+                <helpers:SquareUniformGrid x:Name="MineFieldGrid"/>
+            </Grid>
+        </Viewbox>
+        <ContentControl x:Name="OverlayHost"
+                    Background="#80000000"
+            Visibility="Collapsed" Grid.Row="1"/>
     </Grid>
 </Page>

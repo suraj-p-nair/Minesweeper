@@ -157,3 +157,25 @@ This fix resolves the retry bug where multiple timers were stacking on reset,
 and maintains clear separation of concerns: timer logic in GameTimerService,
 UI rendering in UpdateUIHelper, and orchestration in GamePage.
 
+
+## **Added Failure Scenarios**
+
+feat: add SaveManager and failure handling with mine reveal
+
+- Implemented SaveManager service to persist best times for each difficulty
+  - Uses JSON file in AppData (outside of git) to store personal bests
+  - Automatically loads at app startup
+  - Updates best time only if new score is better
+
+- Added failure case tracking
+  - When a mine is clicked, the clicked mine is highlighted in red
+  - All other cells are revealed to show the full board
+  - Timer stops on failure and result overlay is triggered
+
+- Introduced result overlay system (prepared for reuse in win scenario)
+  - Displays current time and best time (0 shown if no best exists yet)
+  - Overlay provides option to close and review board or return to main menu
+
+This commit establishes the foundation for persistent scoring,
+clear failure feedback, and reusable end-of-game overlays.
+
