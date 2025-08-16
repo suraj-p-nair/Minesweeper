@@ -47,10 +47,6 @@ decoding the special chareccters to properly display in the readme
 
 ## **Added FloodFill**
 
-Here’s a bullet-point summary of what we’ve done so far, combining the **flood fill** changes and the **publish trigger fix**:
-
----
-
 * **Modified  logic**
 
   * If the cell is a mine → show mine icon.
@@ -82,8 +78,3 @@ Here’s a bullet-point summary of what we’ve done so far, combining the **flo
 
   * Added  to the publish job in the GitHub Actions workflow.
   * This ensures the publish step only runs on **branch updates**, not when the branch is first created (which previously caused the wrong commit message to be picked up).
-
----
-
-If you want, I can now also add a **small diagram** explaining the BFS flood fill flow, so the logic is easier to visualize. That might help when someone new looks at the code later.
-
