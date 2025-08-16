@@ -135,3 +135,25 @@ This refactor makes 'GamePage' smaller and focused, improves lookup performance
 by removing per-reveal grid searches, and sets up clear boundaries between
 logic, data, and UI responsibilities.
 
+
+## **Game Timer Fix**
+
+fix: prevent multiple timers on retry and move UI updates into helper
+
+- Updated GameTimerService:
+  - Added internal state (_isRunning, _time) to prevent multiple overlapping timers
+  - Exposed OnTimeChanged event to notify subscribers instead of directly updating UI
+  - Added ResetTimer() to reset time to 0 and trigger UI update
+
+- Updated UpdateUIHelper:
+  - Added UpdateTimer() method to centralize timer text updates
+
+- Updated GamePage:
+  - Subscribed to GameTimerService.OnTimeChanged and routed updates through UI helper
+  - Replaced duplicate timer start calls with ResetTimer()
+  - Ensured ResetButton resets both mines and timer cleanly
+
+This fix resolves the retry bug where multiple timers were stacking on reset,
+and maintains clear separation of concerns: timer logic in GameTimerService,
+UI rendering in UpdateUIHelper, and orchestration in GamePage.
+
