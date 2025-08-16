@@ -1,25 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MineSweeper.Models
+﻿namespace MineSweeper.Models
 {
     public class GameProperties
     {
         public int RowCount { get; set; }
         public int ColumnCount { get; set; }
         public int MineCount { get; set; }
-
-        public GameProperties(int rowCount, int columnCount, int mineCount)
-        {
-            RowCount = rowCount;
-            ColumnCount = columnCount;
-            MineCount = mineCount;
-        }
+        public Difficulty Difficulty { get; set; }
+        public string GameMode => Difficulty.ToString();
         public GameProperties(Difficulty difficulty)
         {
+            Difficulty = difficulty;
             switch (difficulty)
             {
                 case Difficulty.Easy:
@@ -39,7 +29,5 @@ namespace MineSweeper.Models
                     break;
             }
         }
-        public GameProperties() { }
     }
 }
-

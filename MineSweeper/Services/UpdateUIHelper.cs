@@ -17,7 +17,7 @@ namespace MineSweeper.Services
             _mineFieldGrid = mineFieldGrid;
         }
 
-        public void UpdateCellUI(CellData cell)
+        public void UpdateCellUI(CellData cell, bool isExplodedMine = false)
         {
             var btn = GetButtonForCell(cell);
             if (btn == null) return;
@@ -26,11 +26,36 @@ namespace MineSweeper.Services
             {
                 if (cell.IsMine)
                 {
-                    btn.Content = new Image
+                    if (isExplodedMine)
                     {
-                        Source = new BitmapImage(new Uri("pack://application:,,,/Assets/mine.png"))
-                    };
-                    btn.IsEnabled = false;
+                        btn.Content = new Grid
+                        {
+                            Background = Brushes.Red,
+                            Children =
+                            {
+                                new Image
+                                {
+                                    Source = new BitmapImage(new Uri("pack://application:,,,/Assets/mine.png")),
+                                    Stretch = Stretch.Uniform
+                                }
+                            }
+                        };
+                    }
+                    else
+                    {
+                        btn.Content = new Grid
+                        {
+                            Children =
+                            {
+                                new Image
+                                {
+                                    Source = new BitmapImage(new Uri("pack://application:,,,/Assets/mine.png")),
+                                    Stretch = Stretch.Uniform
+                                }
+                            }
+                        };
+                    }
+                        
                 }
                 else if (cell.AdjacentMines > 0)
                 {
@@ -104,6 +129,24 @@ namespace MineSweeper.Services
         public void UpdateTimer(TextBlock timer, int time)
         {
             timer.Text = time.ToString();
+        }
+        public void RevealAll(CellData[,] cells, CellData explodedCell)
+        {
+            foreach (var cell in cells)
+            {
+                cell.IsRevealed = true;
+                if (cell == explodedCell)
+                {
+                    UpdateCellUI(cell, isExplodedMine: true);
+                }
+                else
+                {
+                    UpdateCellUI(cell);
+                }
+                var btn = GetButtonForCell(cell);
+                if (btn == null) return;
+                btn.IsEnabled = false;
+            }
         }
     }
 }

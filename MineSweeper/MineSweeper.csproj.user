@@ -5,6 +5,9 @@
     <Compile Update="Pages\GamePage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Pages\ResultOverlay.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Pages\StartPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

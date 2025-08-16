@@ -26,7 +26,8 @@ namespace MineSweeper.Models
             if (Rows <= 0 || Columns <= 0)
                 return finalSize;
 
-            double cellSize = Math.Min(finalSize.Width / Columns, finalSize.Height / Rows);
+            double rawCellSize = Math.Min(finalSize.Width / Columns, finalSize.Height / Rows);
+            double cellSize = Math.Floor(rawCellSize); // 👈 snap to whole pixel size
 
             double totalWidth = cellSize * Columns;
             double totalHeight = cellSize * Rows;
@@ -50,8 +51,5 @@ namespace MineSweeper.Models
 
             return finalSize;
         }
-
-
     }
-
 }
