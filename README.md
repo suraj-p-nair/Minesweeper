@@ -79,21 +79,6 @@ decoding the special chareccters to properly display in the readme
   * Added  to the publish job in the GitHub Actions workflow.
   * This ensures the publish step only runs on **branch updates**, not when the branch is first created (which previously caused the wrong commit message to be picked up).
 
-## **Update README.md**
-
-
-
-
-## ****
-
-
-
-
-## **Merge branch 'develop' into feature/DoubleClickReveal**
-
-
-
-
 ## **Adding Double Click Logic**
 
 When you double-click a numbered cell, if all of its adjacent mines have been correctly flagged, the game will automatically reveal the remaining unflagged neighboring cells.
