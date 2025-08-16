@@ -40,11 +40,6 @@ decoding the special chareccters to properly display in the readme
 • Mine counter increments when a flag is placed and decrements when a flag is removed.
 • Investigated issue where pull request merge and branch publish still trigger workflow to update README with empty message, added fix for testing.
 
-## ****
-
-
-
-
 ## **Added FloodFill**
 
 * **Modified  logic**
@@ -106,38 +101,3 @@ When you double-click a numbered cell, if all of its adjacent mines have been co
   * XAML’s default  evenly distributes cells but does not guarantee square shapes when rows ≠ columns
   * By writing a custom panel, I learned how WPF layout measurement/arrangement works ( and )
   * Passing game parameters (rows, cols, mines) instead of hardcoding makes the game page more flexible and scalable
-
-
-## **Major Code Refactoring**
-
-refactor: move UI updates into helper service and simplify GamePage
-
-- Introduced  service to handle all button/UI updates
-  - Maintains a  for O(1) cell-to-button lookups
-  - Provides  and  for centralized UI logic
-  - Handles flag/mine/number rendering, including colors and images
-  - Added  and  methods to manage button mappings
-
-- Refactored :
-  - Removed redundant fields (, ) since values come from 
-  - Moved all per-cell UI update logic to 
-  - Simplified , , and  to only call engine + UI helper
-  -  now registers buttons with the helper instead of inline UI logic
-  - Reset flow clears grid, regenerates mines, updates counters, and restarts timer
-
-- Improved code separation:
-  -  → responsible for creating board and calculating adjacent counts
-  -  → responsible for game logic (reveal, flag, flood-fill)
-  -  → responsible for timer control
-  -  → responsible for UI rendering and button lookups
-  -  → now primarily orchestrates services instead of mixing logic/UI
-
-- Misc changes:
-  - Initialized  safely to avoid nullability warnings
-  - Centralized color logic for adjacent mine counts inside helper
-  - UI state for unrevealed cells standardized (light gray background)
-
-This refactor makes  smaller and focused, improves lookup performance
-by removing per-reveal grid searches, and sets up clear boundaries between
-logic, data, and UI responsibilities.
-
