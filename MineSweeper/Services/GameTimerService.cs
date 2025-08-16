@@ -1,23 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-
-namespace MineSweeper.Services
+﻿internal class GameTimerService
 {
-    internal class GameTimerService
+    private bool _isRunning = false;
+    private int _time = 0;
+
+    public event Action<int>? OnTimeChanged; // notify UI helper
+
+    public async void StartTimer()
     {
-        public async void StartTimer(TextBlock timer)
+        if (_isRunning) return;
+        _isRunning = true;
+
+        while (_isRunning)
         {
-            int time = 0;
-            while (true)
-            {
-                await Task.Delay(1000);
-                time++;
-                timer.Text = time.ToString();
-            }
+            await Task.Delay(1000);
+            _time++;
+            OnTimeChanged?.Invoke(_time);
         }
+    }
+
+    public void ResetTimer()
+    {
+        _time = 0;
+        OnTimeChanged?.Invoke(_time);
     }
 }

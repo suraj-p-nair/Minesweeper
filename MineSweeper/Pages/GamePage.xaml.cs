@@ -33,8 +33,13 @@ namespace MineSweeper.Pages
 
             _uiHelper = new UpdateUIHelper(MineFieldGrid);
 
+            _gameTimer.OnTimeChanged += (time) =>
+            {
+                Dispatcher.Invoke(() => _uiHelper.UpdateTimer(Timer, time));
+            };
+
             SetupBoard();
-            _gameTimer.StartTimer(Timer);
+            _gameTimer.StartTimer();
         }
 
         private void SetupBoard()
@@ -111,7 +116,7 @@ namespace MineSweeper.Pages
             _mineCount = MinePositions.Length;
             MineCounter.Text = _mineCount.ToString();
             Timer.Text = "0";
-            _gameTimer.StartTimer(Timer);
+            _gameTimer.ResetTimer();
         }
     }
 }
