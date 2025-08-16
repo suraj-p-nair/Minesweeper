@@ -101,5 +101,9 @@ namespace MineSweeper.Services
             _cellButtonMap.Clear();
             _mineFieldGrid.Children.Clear();
         }
+        public void UpdateTimer(TextBlock timer, int time)
+        {
+            timer.Text = time.ToString();
+        }
     }
 }
