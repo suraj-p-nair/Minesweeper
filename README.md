@@ -88,3 +88,8 @@ decoding the special chareccters to properly display in the readme
 
 
 
+
+## **Merge branch 'develop' into feature/DoubleClickReveal**
+
+
+
