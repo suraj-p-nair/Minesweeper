@@ -12,6 +12,7 @@ on:
 jobs:
   update-readme:
     runs-on: ubuntu-latest
+    if: github.event.created == false
 
     steps:
       - name: Checkout repository
@@ -25,12 +26,6 @@ jobs:
           AUTHOR=$(git log -1 --pretty=format:'%an')
           COMMIT_MSG=$(git log -1 --pretty=%s)
           COMMIT_DESC=$(git log -1 --pretty=%b)
-
-          # Skip if no file changes in this push
-          if [[ "$(git diff --name-only HEAD~1 HEAD | wc -l)" -eq 0 ]]; then
-              echo "Skipping empty push (branch publish)"
-              exit 0
-          fi
 
           # Escape special characters for GitHub Actions env
           COMMIT_MSG="${COMMIT_MSG//'%'/'%25'}"
