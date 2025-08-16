@@ -40,11 +40,6 @@ decoding the special chareccters to properly display in the readme
 • Mine counter increments when a flag is placed and decrements when a flag is removed.
 • Investigated issue where pull request merge and branch publish still trigger workflow to update README with empty message, added fix for testing.
 
-## ****
-
-
-
-
 ## **Added FloodFill**
 
 * **Modified  logic**
@@ -106,4 +101,37 @@ When you double-click a numbered cell, if all of its adjacent mines have been co
   * XAML’s default  evenly distributes cells but does not guarantee square shapes when rows ≠ columns
   * By writing a custom panel, I learned how WPF layout measurement/arrangement works ( and )
   * Passing game parameters (rows, cols, mines) instead of hardcoding makes the game page more flexible and scalable
+
+## **Major Code Refactoring**
+
+refactor: move UI updates into helper service and simplify GamePage
+
+- Introduced 'UpdateUIHelper' service to handle all button/UI updates
+  - Maintains a 'Dictionary<CellData, Button>' for O(1) cell-to-button lookups
+  - Provides 'UpdateCellUI' and 'UpdateMultipleCells' for centralized UI logic
+  - Handles flag/mine/number rendering, including colors and images
+  - Added 'RegisterCellButton' and 'Clear' methods to manage button mappings
+
+- Refactored 'GamePage':
+  - Removed redundant fields ('_rowCount', '_colCount') since values come from 'GameProperties'
+  - Moved all per-cell UI update logic to 'UpdateUIHelper'
+  - Simplified 'FlagCell', 'RevealSingleCell', and 'HandleMouseClick' to only call engine + UI helper
+  - 'SetupBoard' now registers buttons with the helper instead of inline UI logic
+  - Reset flow clears grid, regenerates mines, updates counters, and restarts timer
+
+- Improved code separation:
+  - 'BoardService' → responsible for creating board and calculating adjacent counts
+  - 'GameEngine' → responsible for game logic (reveal, flag, flood-fill)
+  - 'GameTimerService' → responsible for timer control
+  - 'UpdateUIHelper' → responsible for UI rendering and button lookups
+  - 'GamePage' → now primarily orchestrates services instead of mixing logic/UI
+
+- Misc changes:
+  - Initialized 'MineField' safely to avoid nullability warnings
+  - Centralized color logic for adjacent mine counts inside helper
+  - UI state for unrevealed cells standardized (light gray background)
+
+This refactor makes 'GamePage' smaller and focused, improves lookup performance
+by removing per-reveal grid searches, and sets up clear boundaries between
+logic, data, and UI responsibilities.
 
