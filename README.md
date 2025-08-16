@@ -79,22 +79,31 @@ decoding the special chareccters to properly display in the readme
   * Added  to the publish job in the GitHub Actions workflow.
   * This ensures the publish step only runs on **branch updates**, not when the branch is first created (which previously caused the wrong commit message to be picked up).
 
-## **Update README.md**
-
-
-
-
-## ****
-
-
-
-
-## **Merge branch 'develop' into feature/DoubleClickReveal**
-
-
-
-
 ## **Adding Double Click Logic**
 
 When you double-click a numbered cell, if all of its adjacent mines have been correctly flagged, the game will automatically reveal the remaining unflagged neighboring cells.
+
+
+## **Added Difficulties**
+
+* Implemented **multiple difficulty levels** (Easy, Medium, Hard) instead of a single start button
+
+  * Each mode now calls  with dynamic parameters: row count, column count, and mine count
+  * This removes hardcoded values and makes  **reusable for any type of game setup**
+
+* **Issue encountered:** When switching to larger grids (Medium/Hard), the cells stopped being square and instead stretched to fill the screen
+
+  * Example: **30×16 with 60 mines** looked too vertically stretched and uneven
+
+* **Solution:** Created a custom panel  in the **Models/Helpers** folder
+
+  * It overrides  and  to calculate the maximum possible square size that fits both width and height
+  * By taking the **minimum of (available width ÷ columns, available height ÷ rows)**, all cells are forced to remain square, regardless of the grid dimensions
+  * This guarantees consistent appearance across all difficulties without manual adjustment
+
+* **Learning:**
+
+  * XAML’s default  evenly distributes cells but does not guarantee square shapes when rows ≠ columns
+  * By writing a custom panel, I learned how WPF layout measurement/arrangement works ( and )
+  * Passing game parameters (rows, cols, mines) instead of hardcoding makes the game page more flexible and scalable
 
