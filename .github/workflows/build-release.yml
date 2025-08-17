@@ -2,11 +2,6 @@ name: Build and Release Minesweeper Test
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch to release from"
-        required: true
-        default: "release/v1.0.0"
 
 jobs:
   build:
@@ -16,7 +11,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: ${{ github.ref_name }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
