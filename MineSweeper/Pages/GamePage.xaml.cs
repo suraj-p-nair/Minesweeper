@@ -78,7 +78,7 @@ namespace MineSweeper.Pages
         {
             if (sender is Button btn && btn.Tag is CellData cell)
             {
-                if (!_gameTimer.IsRunning)   // <-- we’ll expose this property
+                if (!_gameTimer.IsRunning)
                 {
                     _gameTimer.StartTimer();
                 }
@@ -96,13 +96,15 @@ namespace MineSweeper.Pages
         {
             if (sender is Button btn && btn.Tag is CellData cell)
             {
-                if (!_gameTimer.IsRunning)   // <-- we’ll expose this property
+                if (cell.IsRevealed) return;
+                if (!_gameTimer.IsRunning)
                 {
                     _gameTimer.StartTimer();
                 }
                 if (cell.IsMine)
                 {
                     _gameTimer.StopTimer();
+                    cell.IsRevealed = true;
                     _uiHelper.RevealAll(MineField, cell);
                     EndGame(false);
                     return;
@@ -113,7 +115,12 @@ namespace MineSweeper.Pages
                 {
                     _uiHelper.UpdateCellUI(revealed);
                 }
-                
+                if (_gameEngine.HasWon(MineField, _gameProperties.MineCount))
+                {
+                    _gameTimer.StopTimer();
+                    SaveManager.UpdateBestTime(_gameProperties.Difficulty, _gameTimer.time);
+                    EndGame(true);
+                }
             }
         }
 
@@ -123,14 +130,31 @@ namespace MineSweeper.Pages
             {
                 if (!cell.IsRevealed || cell.AdjacentMines == 0)
                     return;
-                var revealedCells = _gameEngine.RevealNeighborsIfFlagsMatch(cell, MineField);
+
+                var (revealedCells, explodedMine) = _gameEngine.RevealNeighborsIfFlagsMatch(cell, MineField);
 
                 foreach (var revealed in revealedCells)
                 {
                     _uiHelper.UpdateCellUI(revealed);
                 }
+
+                if (explodedMine != null)
+                {
+                    explodedMine.IsRevealed = true; // ✅ ensure it's marked before UI
+                    _gameTimer.StopTimer();
+                    _uiHelper.RevealAll(MineField, explodedMine);
+                    EndGame(false);
+                }
+                else if (_gameEngine.HasWon(MineField, _gameProperties.MineCount))
+                {
+                    _gameTimer.StopTimer();
+                    SaveManager.UpdateBestTime(_gameProperties.Difficulty, _gameTimer.time);
+                    EndGame(true);
+                }
             }
         }
+
+
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
@@ -141,6 +165,8 @@ namespace MineSweeper.Pages
             Timer.Text = "0";
             _gameTimer.StopTimer();
             _gameTimer.ResetTimer();
+            OverlayHost.Content = null;
+            OverlayHost.Visibility = Visibility.Collapsed;
         }
 
         private void EndGame(bool isWin)
@@ -150,6 +176,10 @@ namespace MineSweeper.Pages
             string title = isWin ? "You Win!" : "Game Over";
 
             var overlay = new ResultOverlay(title, currentTime, bestTime);
+            overlay.GoToMainMenuRequested += () =>
+            {
+                NavigationService?.Navigate(new StartPage());
+            };
             OverlayHost.Content = overlay;
             OverlayHost.Visibility = Visibility.Visible;
         }
