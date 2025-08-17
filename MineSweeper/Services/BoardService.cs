@@ -3,10 +3,15 @@ using System.Linq;
 
 namespace MineSweeper.Services
 {
+    /// <summary>
+    /// Builds the logical minefield grid and computes adjacency counts.
+    /// </summary>
     public class BoardService
     {
-        // Create board with mines placed
-        public CellData[,] CreateBoard(GameProperties properties, int[] minePositions)
+        /// <summary>
+        /// Creates a minefield for the given properties and mine indices.
+        /// </summary>
+        public static CellData[,] CreateBoard(GameProperties properties, int[] minePositions)
         {
             int rowCount = properties.RowCount;
             int colCount = properties.ColumnCount;
@@ -28,8 +33,10 @@ namespace MineSweeper.Services
             return mineField;
         }
 
-        // Calculate adjacency for each cell
-        public void CalculateAdjacentMineCount(GameProperties properties, CellData[,] mineField)
+        /// <summary>
+        /// Computes AdjacentMines for each non-mine cell.
+        /// </summary>
+        public static void CalculateAdjacentMineCount(GameProperties properties, CellData[,] mineField)
         {
             int rowCount = properties.RowCount;
             int colCount = properties.ColumnCount;
@@ -46,7 +53,10 @@ namespace MineSweeper.Services
             }
         }
 
-        private void UpdateAdjacentCells(CellData currentCell, GameProperties properties, CellData[,] mineField)
+        /// <summary>
+        /// Increments adjacency counters for neighbors around a single mine cell.
+        /// </summary>
+        private static void UpdateAdjacentCells(CellData currentCell, GameProperties properties, CellData[,] mineField)
         {
             int rowCount = properties.RowCount;
             int colCount = properties.ColumnCount;

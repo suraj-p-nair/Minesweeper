@@ -2,19 +2,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 
 namespace MineSweeper.Services
 {
+    /// <summary>
+    /// Encapsulates gameplay operations:
+    /// - Flag toggling (and mine counter accounting)
+    /// - Flood-reveal for empty cells
+    /// - Chording (reveal neighbors when flags match)
+    /// - Win condition check
+    /// </summary>
     public class GameEngine
     {
-
-       
-        public (bool isFlagged, int mineCount) ToggleFlag(CellData cell, int mineCount)
+        /// <summary>
+        /// Toggle a flag on a cell and adjust the remaining mine counter.
+        /// Returns the new flag state and updated mine count.
+        /// </summary>
+        public static (bool isFlagged, int mineCount) ToggleFlag(CellData cell, int mineCount)
         {
             if (cell.IsRevealed)
                 return (cell.IsFlagged, mineCount);
@@ -27,11 +31,12 @@ namespace MineSweeper.Services
 
             return (cell.IsFlagged, mineCount);
         }
-    
 
-
-       
-        public List<CellData> RevealCell(CellData startCell, CellData[,] mineField)
+        /// <summary>
+        /// Reveal starting cell; flood-fill neighbors if AdjacentMines == 0.
+        /// Returns the list of cells that became revealed by this action.
+        /// </summary>
+        public static List<CellData> RevealCell(CellData startCell, CellData[,] mineField)
         {
             var revealedCells = new List<CellData>();
 
@@ -75,7 +80,10 @@ namespace MineSweeper.Services
             return revealedCells;
         }
 
-        private IEnumerable<CellData> GetNeighbors(CellData cell, CellData[,] mineField)
+        /// <summary>
+        /// Enumerates all valid neighbors around a given cell.
+        /// </summary>
+        private static IEnumerable<CellData> GetNeighbors(CellData cell, CellData[,] mineField)
         {
             int rowCount = mineField.GetLength(0);
             int colCount = mineField.GetLength(1);
@@ -95,7 +103,12 @@ namespace MineSweeper.Services
             }
         }
 
-        public (List<CellData> revealedCells, CellData? explodedMine) RevealNeighborsIfFlagsMatch(CellData cell, CellData[,] mineField)
+        /// <summary>
+        /// If the number of flags around a revealed numbered cell equals its AdjacentMines,
+        /// reveal all unflagged neighbors. Returns (revealedCells, explodedMine).
+        /// explodedMine is non-null if a mine was revealed due to a wrong flag configuration.
+        /// </summary>
+        public static (List<CellData> revealedCells, CellData? explodedMine) RevealNeighborsIfFlagsMatch(CellData cell, CellData[,] mineField)
         {
             var revealed = new List<CellData>();
 
@@ -103,7 +116,7 @@ namespace MineSweeper.Services
                 return (revealed, null);
 
             int flaggedCount = 0;
-            var neighbors = GetNeighbors(cell, mineField); // assume you already have this helper
+            var neighbors = GetNeighbors(cell, mineField);
 
             foreach (var n in neighbors)
             {
@@ -112,11 +125,9 @@ namespace MineSweeper.Services
 
             if (flaggedCount != cell.AdjacentMines)
             {
-                // Not enough flags placed → do nothing
                 return (revealed, null);
             }
 
-            // Flags match → reveal neighbors
             foreach (var n in neighbors)
             {
                 if (!n.IsFlagged && !n.IsRevealed)
@@ -124,18 +135,20 @@ namespace MineSweeper.Services
                     if (n.IsMine)
                     {
                         n.IsRevealed = true;
-                        return (revealed, n); // 🚩 exploded mine found
+                        return (revealed, n);
                     }
 
-                    revealed.AddRange(RevealCell(n, mineField)); // your flood-fill reveal
+                    revealed.AddRange(RevealCell(n, mineField));
                 }
             }
 
             return (revealed, null);
         }
 
-
-        public bool HasWon(CellData[,] mineField, int totalMines)
+        /// <summary>
+        /// Returns true when all non-mine cells are revealed.
+        /// </summary>
+        public static bool HasWon(CellData[,] mineField, int totalMines)
         {
             int totalCells = mineField.Length;
             int safeCells = totalCells - totalMines;
