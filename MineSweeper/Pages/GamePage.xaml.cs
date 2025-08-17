@@ -83,6 +83,7 @@ namespace MineSweeper.Pages
 
                 MineFieldGrid.Children.Add(btn);
                 _uiHelper.RegisterCellButton(cell, btn);
+                MineCounter.Text = _mineCount.ToString();
             }
         }
 

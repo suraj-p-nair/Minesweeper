@@ -1,0 +1,47 @@
+name: Build and Release Minesweeper Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to release from"
+        required: true
+        default: "release/v1.0.0"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Get version from csproj
+        id: get_version
+        run: |
+          $version = (Select-Xml -Path MineSweeper.csproj -XPath "//Version").Node.InnerText
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Publish app
+        run: dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeAllContentForSelfExtract=true -o ./publish
+
+      - name: Zip published app
+        run: Compress-Archive -Path ./publish/* -DestinationPath Minesweeper-${{ steps.get_version.outputs.version }}.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Minesweeper ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          files: Minesweeper-${{ steps.get_version.outputs.version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
