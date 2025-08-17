@@ -4,20 +4,21 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:MineSweeper.Pages"
+      xmlns:factory="clr-namespace:MineSweeper.Factory"
       mc:Ignorable="d" 
-      d:DesignHeight="800" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="600"
       HorizontalAlignment="Stretch"
       VerticalAlignment="Stretch"
       Title="StartPage">
 
     <Grid Background="LightGray">
         <Grid.RowDefinitions>
-            <RowDefinition Height=" 200"/>
+            <RowDefinition Height=" *"/>
             <RowDefinition Height=" 100"/>
             <RowDefinition Height=" 100"/>
             <RowDefinition Height=" 100"/>
             <RowDefinition Height=" 100"/>
-            <RowDefinition Height=" 200"/>
+            <RowDefinition Height=" *"/>
         </Grid.RowDefinitions>
         <TextBlock Text="Minesweeper" 
                FontSize="30" 
@@ -28,7 +29,7 @@
         <Button Content="Medium" Grid.Row="2" FontSize="20" Width="200" Click="StartMedium"></Button>
         <Button Content="Hard" Grid.Row="3" FontSize="20" Width="200" Click="StartHard"></Button>
         <Button Content="Exit" Grid.Row="4"  FontSize="20" Width="200" Click="Exit"></Button>
-        <TextBlock Text="© 2025 My Game" 
+        <TextBlock Text="{factory:AssemblyInfo Property=InformationalVersion}" 
                HorizontalAlignment="Center"
                VerticalAlignment="Center"
                Grid.Row="5"/>

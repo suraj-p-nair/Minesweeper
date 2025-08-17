@@ -23,9 +23,9 @@
                     MineCount = 40;
                     break;
                 case Difficulty.Hard:
-                    RowCount = 16;
+                    RowCount = 20;
                     ColumnCount = 30;
-                    MineCount = 60;
+                    MineCount = 80;
                     break;
             }
         }
