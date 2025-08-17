@@ -9,7 +9,7 @@ namespace MineSweeper.Services
 {
     public class MineGenerator
     {
-        public List<int> GenerateMinePositions(GameProperties properties)
+        public static List<int> GenerateMinePositions(GameProperties properties)
         {
             Random rng = new Random();
             return [.. Enumerable.Range(0, properties.RowCount * properties.ColumnCount)

@@ -7,14 +7,19 @@ using System.Windows.Media;
 
 namespace MineSweeper.Pages
 {
+    /// <summary>
+    /// GamePage represents the main gameplay surface.
+    /// - Initializes board, timer, and engine
+    /// - Handles user input (left/right/double click)
+    /// - Updates UI and game state through helper services
+    /// - Triggers win/lose overlays
+    /// </summary>
     public partial class GamePage : Page
     {
         private readonly GameProperties _gameProperties;
-        private readonly BoardService _gameBoard = new();
         private readonly GameTimerService _gameTimer = new();
-        private readonly GameEngine _gameEngine = new();
         private readonly UpdateUIHelper _uiHelper;
-        private readonly MineGenerator _mineGenerator = new();
+
         private int[] MinePositions = [];
         private int _mineCount;
         private CellData[,] MineField = new CellData[0, 0];
@@ -23,15 +28,19 @@ namespace MineSweeper.Pages
         {
             _gameProperties = gameProperties;
             _mineCount = _gameProperties.MineCount;
-            MinePositions = [.. _mineGenerator.GenerateMinePositions(_gameProperties)];
+
+            // Generate random mine layout
+            MinePositions = [.. MineGenerator.GenerateMinePositions(_gameProperties)];
 
             InitializeComponent();
 
+            // Configure grid
             MineFieldGrid.Rows = _gameProperties.RowCount;
             MineFieldGrid.Columns = _gameProperties.ColumnCount;
 
             _uiHelper = new UpdateUIHelper(MineFieldGrid);
 
+            // Hook timer -> update UI on tick
             _gameTimer.OnTimeChanged += (time) =>
             {
                 Dispatcher.Invoke(() => _uiHelper.UpdateTimer(Timer, time));
@@ -40,13 +49,15 @@ namespace MineSweeper.Pages
             SetupBoard();
         }
 
+        /// <summary>
+        /// Creates the logical minefield + UI grid of buttons.
+        /// </summary>
         private void SetupBoard()
         {
             _uiHelper.Clear();
 
-            MineField = _gameBoard.CreateBoard(_gameProperties, MinePositions);
-
-            _gameBoard.CalculateAdjacentMineCount(_gameProperties, MineField);
+            MineField = BoardService.CreateBoard(_gameProperties, MinePositions);
+            BoardService.CalculateAdjacentMineCount(_gameProperties, MineField);
 
             var (width, height) = BoardSizeFactory.GetSize(
                 _gameProperties.RowCount,
@@ -65,15 +76,19 @@ namespace MineSweeper.Pages
                     Background = Brushes.LightGray
                 };
 
-                btn.Click += RevealSingleCell;
-                btn.MouseRightButtonDown += FlagCell;
-                btn.MouseDoubleClick += HandleMouseClick;
+                // Attach input handlers
+                btn.Click += RevealSingleCell;                // left click
+                btn.MouseRightButtonDown += FlagCell;         // right click
+                btn.MouseDoubleClick += HandleMouseClick;     // double click
 
                 MineFieldGrid.Children.Add(btn);
                 _uiHelper.RegisterCellButton(cell, btn);
             }
         }
 
+        /// <summary>
+        /// Handles flagging/unflagging cells with right-click.
+        /// </summary>
         private void FlagCell(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is CellData cell)
@@ -82,7 +97,8 @@ namespace MineSweeper.Pages
                 {
                     _gameTimer.StartTimer();
                 }
-                var result = _gameEngine.ToggleFlag(cell, _mineCount);
+
+                var result = GameEngine.ToggleFlag(cell, _mineCount);
 
                 cell.IsFlagged = result.isFlagged;
                 _mineCount = result.mineCount;
@@ -92,6 +108,9 @@ namespace MineSweeper.Pages
             }
         }
 
+        /// <summary>
+        /// Handles left-click reveal on a single cell.
+        /// </summary>
         private void RevealSingleCell(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is CellData cell)
@@ -101,21 +120,27 @@ namespace MineSweeper.Pages
                 {
                     _gameTimer.StartTimer();
                 }
+
+                // Clicked a mine -> lose
                 if (cell.IsMine)
                 {
                     _gameTimer.StopTimer();
                     cell.IsRevealed = true;
-                    _uiHelper.RevealAll(MineField, cell);
+                    _uiHelper.RevealAll(MineField, cell); // marks this mine red
                     EndGame(false);
                     return;
                 }
-                var revealedCells = _gameEngine.RevealCell(cell, MineField);
+
+                // Normal reveal
+                var revealedCells = GameEngine.RevealCell(cell, MineField);
 
                 foreach (var revealed in revealedCells)
                 {
                     _uiHelper.UpdateCellUI(revealed);
                 }
-                if (_gameEngine.HasWon(MineField, _gameProperties.MineCount))
+
+                // Check win condition
+                if (GameEngine.HasWon(MineField, _gameProperties.MineCount))
                 {
                     _gameTimer.StopTimer();
                     SaveManager.UpdateBestTime(_gameProperties.Difficulty, _gameTimer.time);
@@ -124,6 +149,10 @@ namespace MineSweeper.Pages
             }
         }
 
+        /// <summary>
+        /// Handles double-click on revealed cell (chording).
+        /// Reveals neighbors if flag count matches.
+        /// </summary>
         private void HandleMouseClick(object sender, MouseButtonEventArgs e)
         {
             if (sender is Button btn && btn.Tag is CellData cell)
@@ -131,7 +160,7 @@ namespace MineSweeper.Pages
                 if (!cell.IsRevealed || cell.AdjacentMines == 0)
                     return;
 
-                var (revealedCells, explodedMine) = _gameEngine.RevealNeighborsIfFlagsMatch(cell, MineField);
+                var (revealedCells, explodedMine) = GameEngine.RevealNeighborsIfFlagsMatch(cell, MineField);
 
                 foreach (var revealed in revealedCells)
                 {
@@ -140,12 +169,13 @@ namespace MineSweeper.Pages
 
                 if (explodedMine != null)
                 {
-                    explodedMine.IsRevealed = true; // ✅ ensure it's marked before UI
+                    // Mine exploded from wrong flag placement
+                    explodedMine.IsRevealed = true;
                     _gameTimer.StopTimer();
                     _uiHelper.RevealAll(MineField, explodedMine);
                     EndGame(false);
                 }
-                else if (_gameEngine.HasWon(MineField, _gameProperties.MineCount))
+                else if (GameEngine.HasWon(MineField, _gameProperties.MineCount))
                 {
                     _gameTimer.StopTimer();
                     SaveManager.UpdateBestTime(_gameProperties.Difficulty, _gameTimer.time);
@@ -154,21 +184,28 @@ namespace MineSweeper.Pages
             }
         }
 
-
-
+        /// <summary>
+        /// Resets the game to a fresh board.
+        /// </summary>
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            MinePositions = _mineGenerator.GenerateMinePositions(_gameProperties).ToArray();
+            MinePositions = [.. MineGenerator.GenerateMinePositions(_gameProperties)];
             SetupBoard();
             _mineCount = MinePositions.Length;
             MineCounter.Text = _mineCount.ToString();
+
             Timer.Text = "0";
             _gameTimer.StopTimer();
             _gameTimer.ResetTimer();
+
+            // Ensure overlay disappears on reset
             OverlayHost.Content = null;
             OverlayHost.Visibility = Visibility.Collapsed;
         }
 
+        /// <summary>
+        /// Ends the game (win/lose) and shows result overlay.
+        /// </summary>
         private void EndGame(bool isWin)
         {
             int currentTime = _gameTimer.time;
@@ -180,10 +217,9 @@ namespace MineSweeper.Pages
             {
                 NavigationService?.Navigate(new StartPage());
             };
+
             OverlayHost.Content = overlay;
             OverlayHost.Visibility = Visibility.Visible;
         }
-
-
     }
 }

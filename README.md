@@ -214,3 +214,9 @@ Added button disabling after game over to prevent further interactions once the 
 
 Improved overall gameplay clarity and user feedback by making the game state (win, lose, mistakes) visually explicit.
 
+
+## **CleanUp**
+
+Adding Function Summary
+making UpdateCellUi smaller
+
