@@ -179,3 +179,38 @@ feat: add SaveManager and failure handling with mine reveal
 This commit establishes the foundation for persistent scoring,
 clear failure feedback, and reusable end-of-game overlays.
 
+
+## **Added Win State**
+
+Implemented win condition checking in GameEngine.HasWon, verifying that all safe cells are revealed.
+
+Added lose condition handling:
+
+The specific mine that caused the explosion is revealed with a red background.
+
+All unflagged mines are revealed.
+
+Wrongly flagged cells display the flag with a ❌ marker.
+
+Correctly flagged mines remain hidden and preserved.
+
+Updated RevealAll method to handle end-of-game reveal consistently:
+
+Exploded mine is highlighted distinctly.
+
+Safe unrevealed cells are revealed.
+
+Incorrect flags are clearly shown.
+
+Correct flags are left untouched.
+
+Improved UpdateCellUI to support:
+
+Rendering exploded mines, wrongly flagged cells, and forced reveals.
+
+Handling background/foreground colors consistently across different states.
+
+Added button disabling after game over to prevent further interactions once the game is finished.
+
+Improved overall gameplay clarity and user feedback by making the game state (win, lose, mistakes) visually explicit.
+

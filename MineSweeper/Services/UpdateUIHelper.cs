@@ -17,12 +17,38 @@ namespace MineSweeper.Services
             _mineFieldGrid = mineFieldGrid;
         }
 
-        public void UpdateCellUI(CellData cell, bool isExplodedMine = false)
+        public void UpdateCellUI(CellData cell, bool isExplodedMine = false, bool isWrongFlag = false, bool forceReveal = false)
         {
             var btn = GetButtonForCell(cell);
             if (btn == null) return;
 
-            if (cell.IsRevealed)
+            if (isWrongFlag)
+            {
+                btn.Content = new Grid
+                {
+                    Children =
+                    {
+                        new Image
+                        {
+                            Source = new BitmapImage(new Uri("pack://application:,,,/Assets/flag.png")),
+                            Stretch = Stretch.Uniform
+                        },
+                        new TextBlock
+                        {
+                            Text = "❌",
+                            Foreground = Brushes.Red,
+                            FontWeight = FontWeights.Bold,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center
+                        }
+                    }
+                };
+                btn.Background = Brushes.LightPink;
+                btn.IsEnabled = false;
+                return;
+            }
+
+            if (cell.IsRevealed || forceReveal)
             {
                 if (cell.IsMine)
                 {
@@ -55,7 +81,6 @@ namespace MineSweeper.Services
                             }
                         };
                     }
-                        
                 }
                 else if (cell.AdjacentMines > 0)
                 {
@@ -76,8 +101,11 @@ namespace MineSweeper.Services
             {
                 btn.Content = new Image
                 {
-                    Source = new BitmapImage(new Uri("pack://application:,,,/Assets/flag.png"))
+                    Source = new BitmapImage(new Uri("pack://application:,,,/Assets/flag.png")),
+                    Stretch = Stretch.Uniform
                 };
+                btn.Background = Brushes.LightGray;
+                btn.IsEnabled = true;
             }
             else
             {
@@ -86,6 +114,8 @@ namespace MineSweeper.Services
                 btn.IsEnabled = true;
             }
         }
+
+
 
         public void UpdateMultipleCells(CellData[,] cells)
         {
@@ -130,23 +160,35 @@ namespace MineSweeper.Services
         {
             timer.Text = time.ToString();
         }
-        public void RevealAll(CellData[,] cells, CellData explodedCell)
+        public void RevealAll(CellData[,] mineField, CellData? explodedMine)
         {
-            foreach (var cell in cells)
+            foreach (var cell in mineField)
             {
-                cell.IsRevealed = true;
-                if (cell == explodedCell)
+                if (cell == explodedMine)
                 {
                     UpdateCellUI(cell, isExplodedMine: true);
                 }
-                else
+                else if (cell.IsMine && cell.IsFlagged)
                 {
-                    UpdateCellUI(cell);
+                    continue;
+                }
+                else if (cell.IsMine && !cell.IsFlagged)
+                {
+                    UpdateCellUI(cell, forceReveal: true);
+                }
+                else if (!cell.IsMine && cell.IsFlagged)
+                {
+                    UpdateCellUI(cell, isWrongFlag: true);
+                }
+                else if (!cell.IsRevealed)
+                {
+                    UpdateCellUI(cell, forceReveal: true);
                 }
                 var btn = GetButtonForCell(cell);
-                if (btn == null) return;
-                btn.IsEnabled = false;
+                if (btn != null)
+                    btn.IsEnabled = false;
             }
         }
+
     }
 }

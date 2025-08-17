@@ -95,67 +95,53 @@ namespace MineSweeper.Services
             }
         }
 
-        public List<CellData> RevealNeighborsIfFlagsMatch(CellData startCell, CellData[,] mineField)
+        public (List<CellData> revealedCells, CellData? explodedMine) RevealNeighborsIfFlagsMatch(CellData cell, CellData[,] mineField)
         {
-            if (!CheckIfFlagsMatch(startCell, mineField))
-                return new List<CellData>();
-
             var revealed = new List<CellData>();
 
-            foreach (int dr in new[] { -1, 0, 1 })
+            if (!cell.IsRevealed || cell.AdjacentMines == 0)
+                return (revealed, null);
+
+            int flaggedCount = 0;
+            var neighbors = GetNeighbors(cell, mineField); // assume you already have this helper
+
+            foreach (var n in neighbors)
             {
-                foreach (int dc in new[] { -1, 0, 1 })
+                if (n.IsFlagged) flaggedCount++;
+            }
+
+            if (flaggedCount != cell.AdjacentMines)
+            {
+                // Not enough flags placed → do nothing
+                return (revealed, null);
+            }
+
+            // Flags match → reveal neighbors
+            foreach (var n in neighbors)
+            {
+                if (!n.IsFlagged && !n.IsRevealed)
                 {
-                    if (dr == 0 && dc == 0) continue;
-
-                    int nr = startCell.Row + dr;
-                    int nc = startCell.Col + dc;
-
-                    if (nr >= 0 && nr < mineField.GetLength(0) && nc >= 0 && nc < mineField.GetLength(1))
+                    if (n.IsMine)
                     {
-                        CellData neighbor = mineField[nr, nc];
-
-                        if (!neighbor.IsMine && !neighbor.IsRevealed && !neighbor.IsFlagged)
-                        {
-                            // delegate to RevealCell (so floodfill reuse happens here)
-                            var revealedFromNeighbor = RevealCell(neighbor, mineField);
-                            revealed.AddRange(revealedFromNeighbor);
-                        }
+                        n.IsRevealed = true;
+                        return (revealed, n); // 🚩 exploded mine found
                     }
+
+                    revealed.AddRange(RevealCell(n, mineField)); // your flood-fill reveal
                 }
             }
 
-            return revealed;
+            return (revealed, null);
         }
 
-        private bool CheckIfFlagsMatch(CellData cell, CellData[,] mineField)
+
+        public bool HasWon(CellData[,] mineField, int totalMines)
         {
-            int currRow = cell.Row;
-            int currCol = cell.Col;
+            int totalCells = mineField.Length;
+            int safeCells = totalCells - totalMines;
+            int revealedSafe = mineField.Cast<CellData>().Count(c => !c.IsMine && c.IsRevealed);
 
-            foreach (int dr in new[] { -1, 0, 1 })
-            {
-                foreach (int dc in new[] { -1, 0, 1 })
-                {
-                    if (dr == 0 && dc == 0)
-                        continue;
-
-                    int nr = currRow + dr;
-                    int nc = currCol + dc;
-
-                    if (nr >= 0 && nr < mineField.GetLength(0) && nc >= 0 && nc < mineField.GetLength(1))
-                    {
-                        if ((!mineField[nr, nc].IsMine && mineField[nr, nc].IsFlagged) ||
-                            (mineField[nr, nc].IsMine && !mineField[nr, nc].IsFlagged))
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-            return true;
+            return revealedSafe == safeCells;
         }
-
-
     }
 }

@@ -5,6 +5,7 @@ namespace MineSweeper.Pages
 {
     public partial class ResultOverlay : UserControl
     {
+        public event Action? GoToMainMenuRequested;
         public ResultOverlay(string title, int currentTime, int? bestTime)
         {
             InitializeComponent();
@@ -20,9 +21,7 @@ namespace MineSweeper.Pages
 
         private void MainMenu_Click(object sender, RoutedEventArgs e)
         {
-            // navigate back
-            var nav = Window.GetWindow(this)?.Content as Frame;
-            nav?.Navigate(new StartPage());
+            GoToMainMenuRequested?.Invoke();
         }
     }
 }
