@@ -1,4 +1,4 @@
-name: Build and Release Minesweeper
+name: Build and Release Minesweeper Test
 
 on:
   workflow_dispatch:
