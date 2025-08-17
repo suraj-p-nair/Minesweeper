@@ -2,11 +2,9 @@ name: Build and Release Minesweeper Test
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch to release from"
-        required: true
-        default: "release/v1.0.0"
+    
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -16,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: ${{ github.ref_name }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -26,11 +24,13 @@ jobs:
       - name: Get version from csproj
         id: get_version
         run: |
-          $version = (Select-Xml -Path MineSweeper.csproj -XPath "//Version").Node.InnerText
+          # Extract version
+          $version = (Select-Xml -Path ./Minesweeper/MineSweeper.csproj -XPath "//Version").Node.InnerText
           echo "version=$version" >> $env:GITHUB_OUTPUT
 
+
       - name: Publish app
-        run: dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeAllContentForSelfExtract=true -o ./publish
+        run: dotnet publish ./Minesweeper/MineSweeper.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeAllContentForSelfExtract=true -o ./publish
 
       - name: Zip published app
         run: Compress-Archive -Path ./publish/* -DestinationPath Minesweeper-${{ steps.get_version.outputs.version }}.zip
