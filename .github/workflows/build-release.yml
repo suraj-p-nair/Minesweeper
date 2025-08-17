@@ -2,6 +2,9 @@ name: Build and Release Minesweeper Test
 
 on:
   workflow_dispatch:
+    
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -27,7 +30,7 @@ jobs:
 
 
       - name: Publish app
-        run: dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeAllContentForSelfExtract=true -o ./publish
+        run: dotnet publish ./Minesweeper/MineSweeper.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeAllContentForSelfExtract=true -o ./publish
 
       - name: Zip published app
         run: Compress-Archive -Path ./publish/* -DestinationPath Minesweeper-${{ steps.get_version.outputs.version }}.zip
